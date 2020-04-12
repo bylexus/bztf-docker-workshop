@@ -1,0 +1,1 @@
+docker run --name wp-db -d --net wp-net -v wp-db:/var/lib/mysql  -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=wordpress -e MYSQL_USER=wordpress -e MYSQL_PASSWORD=wordpress mysql:5

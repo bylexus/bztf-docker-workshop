@@ -1,0 +1,1 @@
+docker run -d --name wp-web --net wp-net -v wp-data:/var/www/html -e WORDPRESS_DB_HOST=wp-db -e WORDPRESS_DB_USER=root -e WORDPRESS_DB_PASSWORD=root -e WORDPRESS_DB_NAME=wordpress -p 80:80 wordpress

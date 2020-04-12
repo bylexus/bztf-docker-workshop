@@ -1,0 +1,1 @@
+docker run --rm -ti -v /Users/alex/dev/docker-workshop/files/image-examples:/data acleancoder/imagemagick-full sh -c 'for i in /data/*.jpg; do echo $i;convert $i -resize 50% $i.png;done'

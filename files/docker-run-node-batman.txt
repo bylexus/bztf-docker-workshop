@@ -1,0 +1,1 @@
+docker run --rm -ti node:slim node -e "console.log(Array(16).join('wat'-1) + ' Batman')"

@@ -1,0 +1,1079 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>Docker-Workshop</title>
+
+		<link rel="stylesheet" href="css/reset.css">
+		<link rel="stylesheet" href="css/reveal.css">
+        <link rel="stylesheet" href="css/theme/solarized-alex.css">
+        <link href="css/fontawesome/css/all.css" rel="stylesheet"> <!--load all styles -->
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="lib/css/monokai.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+<!-- ************************************** -->
+<section data-background-image="img/docker-official.svg.png" data-background-size="contain">
+    <h1 style="font-size: 2em">BZTF Docker-Workshop</h1>
+    <p style="font-size: 0.8em">15.02.2020</p>
+    <p style="font-size: 0.8em">Alex Schenkel</p>
+
+</section>
+
+<!-- ************************************** -->
+<section
+    data-background-image="img/docker-official.svg.png"
+    data-background-size="100px"
+    data-background-repeat="no-repeat"
+    data-background-position="top right"
+    data-markdown
+>
+<textarea data-template>
+# <i class="fas fa-download"></i> Doku
+
+Diese Präsenation ist verfügbar unter:
+
+* http://x.y.v.z/
+* Offline: http://x.y.v.z/workshop.zip
+* Alle Kommandos und Files: http://x.y.v.z/files/
+</textarea>
+</section>
+
+<!-- ************************************** -->
+<section
+    data-background-image="img/docker-official.svg.png"
+    data-background-size="100px"
+    data-background-repeat="no-repeat"
+    data-background-position="top right"
+    data-markdown
+>
+<textarea data-template>
+# <i class="fas fa-exclamation" style="color:tomato"></i> Achtung <i class="fas fa-exclamation" style="color:tomato"></i>
+
+Kommandozeile voraus!
+
+<img src="img/ch01-whale.png" />
+
+<i class="fab fa-windows" style="color:dodgerblue"></i> Für Windows-User: **keine Angst!** Das schwarze Fenster beisst nicht!
+
+<i class="fab fa-linux"></i> Für Linux/Unix-User: ihr kennt das ja...
+
+</textarea>
+</section>
+
+
+<!-- ************************************** -->
+<section
+    data-background-image="img/docker-official.svg.png"
+    data-background-size="100px"
+    data-background-repeat="no-repeat"
+    data-background-position="top right"
+    data-markdown
+>
+<textarea data-template>
+# <i class="far fa-calendar-alt"></i> Agenda
+
+<i class="far fa-clock"></i> 4 Lektionen | <i class="fas fa-mug-hot"></i> Pausen nach Wunsch
+
+* Ein wenig Theorie: Was ist Docker?
+  * Architektur
+  * Komponenten
+* Learning By Doing:
+    * Erste Schritte: Setup und Hello World!
+    * Vorhandene Docker-Images anwenden
+        * Erstellen / Starten / Stoppen / Managen
+        * Portainer - Docker-Management made simple
+        * Docker als Kommandozeilen-Werkzeug nutzen
+        * Volumes: Applikationsdaten persistent speichern
+        * Networking: Kommunikation mit anderen Containern
+    * Mehrere Container orchestrieren: `docker-compose`
+    * Eigene Docker-Images bauen: manuell und mit Dockerfiles
+</textarea>
+</section>
+
+<!-- ************************************** -->
+<section
+    data-background-image="img/docker-official.svg.png"
+    data-background-size="100px"
+    data-background-repeat="no-repeat"
+    data-background-position="top right"
+>
+<section data-markdown>
+<textarea data-template>
+# <i class="fab fa-docker" style="color:#1D91B3"></i> Was ist Docker?
+
+* <!-- .element class="fragment" --> <q>Docker is a tool designed to make it easier to create, deploy, and run applications by using containers.</q> - Aha?
+* <!-- .element class="fragment" --> Docker ist eine Sammlung von Tools, die schon lange bestehende Technik einfach nutzbar macht.
+* <!-- .element class="fragment" --> Docker isoliert Prozesse, Speicher und Daten gegenüber anderen <q>Containern</q>
+* <!-- .element class="fragment" --> (Docker-)Container nutzen alle denselben <strong>Linux-Kernel-Prozess</strong> <i class="fab fa-linux"></i>
+* <!-- .element class="fragment" --> Docker nutzt bestehende Linux-Container-Technologie <i class="far fa-hand-point-right"></i> ist also nichts neues!
+</textarea>
+</section>
+<section data-markdown>
+
+<textarea data-template>
+# <span class="fa-stack"><i class="fab fa-docker fa-stack-1x" style="color:#1D91B3"></i><i class="fas fa-ban fa-stack-2x" style="color:Tomato"></i></span> Was ist Docker NICHT?
+
+* <!-- .element class="fragment" --> Docker ist KEINE Virtuelle Maschine (VM).
+* <!-- .element class="fragment" --> Docker ist NICHT System-unabhängig: Es läuft <em>nur</em> unter Linux <span style="font-size:0.7em">(Ja aber...)</span>
+* <!-- .element class="fragment" --> Docker ist NICHTS NEUES, nur das kluge Zusammenfügen von bestehenden Technologien
+* <!-- .element class="fragment" --> Docker-Container arbeiten NICHT wie traditionelle Linux-Systeme
+    * Es läuft (meist) nur 1 Hauptprozess pro Container (keine Daemons)
+    * Für mehrere Dienste werden mehrere Container eingesetzt
+* <!-- .element class="fragment" --> Docker kann die Welt nicht retten :-)
+    <br /> heisst: wie alle Tools hat es seinen Einsatzzweck, und ist kein Allerheilmittel.
+</textarea>
+</section>
+
+<section data-markdown>
+<textarea data-template>
+# <i class="fab fa-docker" style="color:#1D91B3"></i> Wie wird Docker genutzt?
+
+* zur Software-Entwicklung:
+    * Gleiche Tools, gleiche Versionen für alle Entwickler
+    * einfaches Deployment von Enticklungstools
+    * CI / CD-Pipelines, Testing
+* **Lernumgebungen - für alle gleich und einfach!**
+* zum einfachen Nutzen von Tools (bsp: MySQL-client in bestimmter Version, mehrere PHP-Versionen ...)
+* zum Debugging / Netzwerk-Analyse
+  * Bsp: Man-in-the-Middle-Proxy für SSL-Verbindungen
+* DevOps
+  * Microservice-Architekturen, Einfaches Deployment von Services
+  * Cluster- und Schwarm-Umgebungen, high-availability
+* ... und vieles mehr!
+</textarea>
+</section>
+
+<section data-markdown>
+<textarea data-template>
+# <i class="fab fa-docker" style="color:#1D91B3"></i> Vorteile Docker
+
+... gegenüber herkömlichen VMs und anderen Containerlösungen:
+
+* Sehr kleiner Ressourcenverbrauch - auch bei vielen Containern
+* Sehr einfache Handhabung
+* Sehr viele frei verfügbare, fertige Images
+* Läuft sauber integriert auch auf Windows, MacOS (neben Linux)
+</textarea>
+</section>
+</section>
+
+<!-- ************************************** -->
+<section
+    data-background-image="img/docker-official.svg.png"
+    data-background-size="100px"
+    data-background-repeat="no-repeat"
+    data-background-position="top right"
+>
+<section data-markdown>
+<textarea data-template>
+# <i class="fab fa-docker" style="color:#1D91B3"></i> VM <i class="fas fa-exchange-alt"></i> Docker
+
+Eine Virtuelle Maschine und Linux-Container funktionieren grundsätzlich anders:
+<div style="display:flex">
+<figure style="margin-right:10px">
+    <img src="img/vm-vs-container.png" />
+    <figcaption>Quelle: dev-insider.de</figcaption>
+</figure>
+
+<ul>
+    <li class="fragment">VMs "simulieren" Hardware</li>
+    <li class="fragment">Daher kann in einer VM unter Linux auch ein Windows laufen</li>
+    <li class="fragment">Container isolieren "nur" Prozesse</li>
+    <li class="fragment">... und verwenden gemeinsam einen Linux-Kernel</li>
+    <li class="fragment">Container sind daher viel "leichtgewichtiger" als VMs.</li>
+</ul>
+</div>
+</textarea>
+</section>
+
+<section data-markdown>
+<textarea data-template>
+# <i class="fab fa-docker" style="color:#1D91B3"></i> Docker-Architektur
+
+Die Docker-Architektur besteht aus ...
+
+<div style="display:flex">
+<figure style="margin-right:10px;width:50%">
+    <img src="img/docker-arch.png" />
+    <figcaption>Quelle: docker.com</figcaption>
+</figure>
+<ul>
+    <li>dem Docker-Daemon<br />(Manage-Prozess)</li>
+    <li>Containern (mehr dazu in der Praxis)</li>
+    <li>Images<br />(fertig gebauten Software-Layern)</li>
+    <li>der Registry (Online-Image-Hub)</li>
+    <li>Volumes (teilbare Daten-Stores)</li>
+    <li>Networking (Netzwerk-Konfiguration)</li>
+</ul>
+</div>
+</textarea>
+</section>
+
+<section data-markdown>
+<textarea data-template>
+# <i class="fab fa-docker" style="color:#1D91B3"></i> Docker-Architektur
+
+Ein Container ist eine Schichtung von mehreren (Read-Only-)Images, und einner dünnen,
+erst leeren, beschreibbaren Schicht:
+
+<figure style="margin-right:10px">
+    <img src="img/docker-images.png" />
+    <figcaption>Quelle: docker.com</figcaption>
+</figure>
+Images können für mehrere Container wiederverwendet werden: Das spart enorm Platz.
+</div>
+
+</textarea>
+</section>
+
+
+<section data-markdown>
+<textarea data-template>
+# <i class="fab fa-docker" style="color:#1D91B3"></i> Docker-Engine
+
+Die _Docker-Engine_ verwaltet alle Aspekte rund um Docker-Images und Container:
+
+<div style="display:flex">
+<figure style="margin-right:10px">
+    <img src="img/docker-engine.png" />
+    <figcaption>Quelle: docker.com</figcaption>
+</figure>
+
+<ul>
+    <li>Ein Server-Prozess verwaltet die laufenden Container, Images, Volumes etc...</li>
+    <li>Eine REST-API dient der Kommunikation mit der API</li>
+    <li>Ein Client bietet ein User-Interface für die Docker-Verwaltung</li>
+</ul>
+</div>
+</textarea>
+</section>
+</section>
+
+
+
+<!-- ************************************** -->
+<section
+    data-background-image="img/docker-official.svg.png"
+    data-background-size="100px"
+    data-background-repeat="no-repeat"
+    data-background-position="top right"
+    data-markdown
+>
+<textarea data-template>
+# <i class="fas fa-link" style="color:#1D91B3"></i> Zusammenspiel
+
+<div style="display:flex">
+    <img src="img/docker-example.png" style="width:70%; border:none"/>
+    <ul>
+        <li class="fragment">Docker-Philosophie: <br /><q>One Service, One Container</q></li>
+        <li class="fragment">Container können über internes Netzwerk kommunizieren</li>
+        <li class="fragment">über Port Mapping können TCP-Ports "gegen aussen" freigegeben werden</li>
+        <li class="fragment">Wir bauen also nicht 1 "VM", sondern viele kleine Dienste,
+            welche zusammenarbeiten.
+        </li>
+    </ul>
+</div>
+
+* <!-- .element class="fragment" --> Vorteil: Viele kleine, einfach wartbare und austauschbare Dienste
+* <!-- .element class="fragment" --> Nachteil: Viele kleine, einfach wartbare und austauschbare Dienste ;-)
+</textarea>
+</section>
+
+
+<!-- ************************************** -->
+<section
+    data-background-image="img/docker-official.svg.png"
+    data-background-size="100px"
+    data-background-repeat="no-repeat"
+    data-background-position="top right"
+    data-markdown
+>
+<textarea data-template>
+# <i class="fab fa-docker" style="color:#1D91B3"></i> Docker praktisch
+* **Ziel**: Docker-Konzepte direkt praktisch erlernen
+* Ich zeige euch an Beispielen, wie Docker funktioniert
+* Mitmachen / Direkt ausprobieren / Experimentieren erwünscht!
+
+<i class="far fa-hand-point-right"></i> Wenn ich euch langweile: intervenieren!
+
+Erster Schritt: **Installation von Docker**
+
+* [Docker Desktop for Windows](https://docs.docker.com/docker-for-windows/install/)
+* [Docker Desktop for Mac](https://docs.docker.com/docker-for-mac/)
+* [Docker unter Linux](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
+</textarea>
+</section>
+
+
+<!-- ************************************** -->
+<section
+    data-background-image="img/docker-official.svg.png"
+    data-background-size="100px"
+    data-background-repeat="no-repeat"
+    data-background-position="top right"
+>
+<h1><i class="fab fa-docker" style="color:#1D91B3"></i> Hello, Docker World!</h1>
+
+<p>
+Siehe:  <a href="https://docs.docker.com/get-started/">Docker: Getting Started</a>
+</p>
+
+<p>Ersten Container vom Docker Hub-Image erstellen und starten:</p>
+
+<pre><code class="hljs plain" data-noescape><strong>$ docker run hello-world</strong>
+
+Unable to find image 'hello-world:latest' locally
+latest: Pulling from library/hello-world
+1b930d010525: Pull complete
+Digest: sha256:9572f7cdcee8591948c2963463447a53466950b3fc15a247fcad1917ca215a2f
+Status: Downloaded newer image for hello-world:latest
+
+Hello from Docker!
+This message shows that your installation appears to be working correctly.
+</code></pre>
+
+<p>Container auflisten:</p>
+
+<pre><code class="hljs plain" data-noescape><strong>$ docker ps -a</strong>
+
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS                      PORTS                                         NAMES
+054c3a152277        hello-world         "/hello"                 9 minutes ago       Exited (0) 9 minutes ago                                                  zealous_aryabhata
+</code></pre>
+
+<p>Container löschen:</p>
+
+<pre><code class="hljs plain" data-noescape><strong>$ docker rm [container-name]</strong>
+</code></pre>
+</section>
+
+<!-- ************************************** -->
+<section
+    data-background-image="img/docker-official.svg.png"
+    data-background-size="100px"
+    data-background-repeat="no-repeat"
+    data-background-position="top right"
+>
+<section data-markdown>
+<textarea data-template>
+# <i class="fas fa-terminal" style="color:#1D91B3"></i> Container-Management
+
+Die wichtigsten Befehle rund um Container - am Beispiel von [Wiki.js](https://wiki.js.org/)
+
+Image vom [Docker-Hub](https://hub.docker.com/) pullen:
+
+<pre><code class="hljs plain" data-noescape><strong>$ docker pull requarks/wiki</strong>
+</code></pre>
+
+Lokale Images auflisten:
+
+<pre><code class="hljs plain" data-noescape><strong>$ docker images</strong>
+</code></pre>
+
+Neuen Container aus Image erstellen und starten (im Hintergrund):
+
+<pre><code class="hljs plain" data-noescape><strong>$ docker run -d --name wiki -p 80:3000 -e DB_TYPE=sqlite requarks/wiki</strong>
+    ### Erklärung der Parameter:
+    -d            # als Daemon im Hintergrund
+    --name wiki   # Name des Containers
+    -p 80:3000    # Port-Mapping: Mappe Host-Port 80 auf Docker-Port 3000
+    -e ....       # Setzen einer Umgebungsvariablen
+    requarks/wiki # Name des Images als Grundlage für den Container
+</code></pre>
+
+Container stoppen:
+
+<pre><code class="hljs plain" data-noescape><strong>$ docker stop wiki</strong>
+</code></pre>
+
+... und wieder starten:
+
+<pre><code class="hljs plain" data-noescape><strong>$ docker start wiki</strong>
+</code></pre>
+</textarea>
+</section>
+
+<section data-markdown>
+<textarea data-template>
+# <i class="fas fa-terminal" style="color:#1D91B3"></i> Container-Management
+
+Container-Logs listen:
+
+<pre><code class="hljs plain" data-noescape><strong>$ docker logs --tail 100 --follow [container]</strong>
+</code></pre>
+
+Container-Live-Statistiken:
+<pre><code class="hljs plain" data-noescape><strong>$ docker stats [container]</strong>
+</code></pre>
+
+Ein Kommando im laufenden Container ausführen:
+<pre><code class="hljs plain" data-noescape><strong>$ docker exec -ti [container] node -e "console.log('Hello World!')"</strong>
+     oder z.B. Shell ausführen:
+<strong>$ docker exec -ti [container] bash</strong>
+</code></pre>
+
+Ein Single-Shot-Container für ein Kommando ausführen: <span style="font-size: 0.5em">[ (Bsp: JavaScript-Snippet ausführen) ](./files/docker-run-node-batman.txt)</span>
+<pre><code class="hljs plain" data-noescape><strong>$ docker run --rm -ti node:slim node -e "console.log(Array(16).join('wat'-1) + ' Batman')"</strong>
+# Erklärung der Parameter:
+    run           # Pullen eines Images und Starten eines Containers
+    --rm          # Nach dem Stoppen Container wieder entfernen
+    -ti           # Kurz für -t -i (attach terminal, interactive)
+    node:slim     # Name des Images
+    # auszuführendes Kommando im Container, anstatt vorkonfiguriertes:
+    node -e "console.log(Array(16).join('wat'-1) + ' Batman')"
+</code></pre>
+
+</textarea>
+</section>
+
+<section data-markdown>
+<textarea data-template>
+# <i class="fas fa-desktop" style="color:#1D91B3"></i> Lieber mit UI: Portainer
+
+Wer's lieber grafisch mag: [Portainer.io](https://www.portainer.io/) ist eine grafische Oberfläche für das
+Docker-Management, und kommt natürlich auch als Docker-Image.
+
+[ Portainer.io unter Windows starten: ](./files/docker-run-portainer-win.txt)
+
+<pre><code class="hljs plain" data-noescape><strong>$ docker run -d -p 9000:9000 ^
+    --name portainer ^
+    -v \\.\pipe\docker_engine:\\.\pipe\docker_engine ^
+    -v C:\ProgramData\Portainer:/data ^ portainer/portainer</strong>
+</code></pre>
+
+[ Portainer.io unter Linux/MacOS starten: ](./files/docker-run-portainer-linux.txt)
+
+<pre><code class="hljs plain" data-noescape><strong>$ docker run -d -p 9000:9000 \
+    -v /var/run/docker.sock:/var/run/docker.sock \
+    -v portainer_data:/data \
+    portainer/portainer</strong>
+</code></pre>
+
+</textarea>
+</section>
+</section>
+
+<!-- ************************************** -->
+<section
+    data-background-image="img/docker-official.svg.png"
+    data-background-size="100px"
+    data-background-repeat="no-repeat"
+    data-background-position="top right"
+>
+<section data-markdown>
+<textarea data-template>
+# <i class="fas fa-meteor" style="color:#1D91B3"></i> Single-Shot-Usage
+
+Docker ist sehr nützlich, wenn man Tools benötigt, welche für die Plattform nicht
+verfügbar sind oder schwierig zu installieren sind. Hier hilft `docker run --rm`.
+Ein paar Beispiele:
+
+MySQL / PostgreSQL-Client in einer bestimmten Version (z.B. für DB-Dumps):
+
+<pre><code class="hljs plain" data-noescape><strong>$ docker run --rm -ti mysql:5.5 mysqldump -u root -h mysqlserver -p mydb > dump.sql
+# Postgresql:
+$ docker run --rm -ti postgres:9.5 pg_dump -U postgres -h postgresserver mydb > backup.sql </strong>
+</code></pre>
+
+Image-Konvertierung mit ImageMagick: <span style="font-size:0.5em">[ (Achtung, shell-script-alert!) ](./files/docker-run-imagemagick.txt)</span>
+
+<pre><code class="hljs plain" data-noescape><strong>$ docker run --rm -ti \
+    -v /Users/alex/dev/docker-workshop/files/image-examples:/data \
+    acleancoder/imagemagick-full \
+    sh -c 'for i in /data/*.jpg; do echo $i;convert $i -resize 50% $i.png;done'</strong>
+</code></pre>
+
+Linux-Tools verwenden: Beispiel: bc als Zahlensystem-Umrechner:
+
+<pre><code class="hljs plain" data-noescape><strong>$ docker run --rm -ti alpine sh -c 'echo "obase=2;65523"|bc'
+> 1111111111110011
+$ docker run --rm -ti alpine sh -c 'echo "ibase=16;obase=2;3F7A"|bc'
+> 11111101111010
+</strong>
+</code></pre>
+</textarea>
+</section>
+</section>
+
+<!-- ************************************** -->
+<section
+    data-background-image="img/docker-official.svg.png"
+    data-background-size="100px"
+    data-background-repeat="no-repeat"
+    data-background-position="top right"
+    data-markdown
+>
+<textarea data-template>
+# <i class="fas fa-futbol" style="color:#1D91B3"></i> Jetzt gehts rund!
+
+Für die nächsten Kapitel, **Volumes** und **Networking** brauchen wir
+"richtige" Anwendungen.
+
+Ich zeige die Verwendung am Beispiel **<i class="fab fa-wordpress"></i> Wordpress mit MySQL**.
+
+Ihr dürft gerne ein eigenes Projekt ausprobieren. Ein paar Ideen:
+
+* [Nextcloud (ehemals Owncloud)](https://hub.docker.com/_/nextcloud/)
+* [Wordpress](https://hub.docker.com/_/wordpress)
+* [Ghost Blog Plattform](https://hub.docker.com/_/ghost/)
+* [Dokuwiki](https://hub.docker.com/r/bitnami/dokuwiki)
+* [Moodle](https://hub.docker.com/r/bitnami/moodle/)
+* ein Apache/PHP/MySQL-Stack (mind. 2 Container), z.B. [hiermit](https://hub.docker.com/_/php)
+* ein Datenbank-Server deiner Wahl:
+     [PostgreSQL](https://hub.docker.com/_/postgres),
+     [MySQL](https://hub.docker.com/_/mysql),
+     [MongoDB](https://hub.docker.com/_/mongo)
+
+... oder eine eigene Idee: https://hub.docker.com/
+
+</textarea>
+</section>
+
+<!-- ************************************** -->
+<section
+    data-background-image="img/docker-official.svg.png"
+    data-background-size="100px"
+    data-background-repeat="no-repeat"
+    data-background-position="top right"
+>
+<section data-markdown>
+<textarea data-template>
+# <i class="fab fa-wordpress" style="color:#1D91B3"></i> WP + MySQL
+
+Ein Standard-Szenario: **Wordpress als Blog-System**
+
+**Ziele:**
+
+* **2 getrennte Container**: ein Wordpress-Container, ein MySQL-Container
+* Wordpress soll öffentlich via Web erreichbar sein (**Port-Mapping**)
+* Wordpress verbindet intern via TCP auf MySQL (**Bridge Network**)
+* Persistente Daten (**Volumes**)
+* File-Backup der Daten (**Volume-Backup**)
+
+<img src="img/wp-mysql.png" />
+
+</textarea>
+</section>
+
+<section data-markdown>
+<textarea data-template>
+# <i class="fab fa-wordpress" style="color:#1D91B3"></i> WP + MySQL
+
+Schritt 1: Wir erstellen ein **Managed Volume** und ein **Bridge Network**:
+
+* Ein **Managed Volume** ist ein Speicherbereich im Filesystem für Container, welcher persistent bleibt, auch wenn der Container
+  entfernt wird:
+
+```sh
+$ docker volume create wp-db        # neues Managed Volume erstellen
+$ docker volume ls                  # Volumes auflisten
+```
+
+* Ein **Bridge Network** erlaubt die Kommunikation unter Containern auf **einem** Docker-Host:
+
+```sh
+$ docker network create wp-net      # neues Bridge Network erstellen
+$ docker network ls                 # Networks auflisten
+```
+
+<i class="fas fa-hand-point-right"></i> Mehr theoretisches dazu später / wenn interessiert
+
+</textarea>
+</section>
+
+<section data-markdown>
+<textarea data-template>
+# <i class="fab fa-wordpress" style="color:#1D91B3"></i> WP + MySQL
+
+Schritt 2: [ Den **MySQL-Container** erstellen: ](./files/docker-run-create-mysql.txt)
+
+```sh
+docker run --name wp-db -d --net wp-net -v wp-db:/var/lib/mysql \
+           -e MYSQL_ROOT_PASSWORD=root \
+           -e MYSQL_DATABASE=wordpress \
+           -e MYSQL_USER=wordpress \
+           -e MYSQL_PASSWORD=wordpress \
+           mysql:5
+
+#  --name wp-db             # der Container heisst "wp-db": das ist auch sein interner DNS-Name
+#  -d                       # als Daemon (Hintergrundprozess) starten
+#  --net wp-net             # der Container wird mit dem wp-net verbunden
+#  -v wp-db:/var/lib/mysql  # wir mounten das managed volume ins Container-Dir /var/lib/mysql
+#  -e MYSQL_ROOT_PASSWORD   # wir definieren das DB-root-Passwort
+#  -e ...                   # ... und eine Initial-DB inkl. User und PW
+#  mysql:5                  # wir erstellen den Container vom Image 'mysql', in Verson 5
+```
+
+Beim ersten Start werden die MySQL-DB-Daten in unser persistentes Volume `wp-db` geschrieben.
+
+Wir schauen, ob's geklappt hat:
+
+```sh
+# Log-Ausgabe des Containers folgen:
+$ docker logs --follow wp-db
+
+## Wir starten einen zweiten, temporären Container mit demselben Managed Volume,
+## und lassen uns den Inhalt anzeigen:
+$ docker run --rm --volumes-from wp-db mysql:5 ls -l /var/lib/mysql
+```
+
+</textarea>
+</section>
+
+<section data-markdown>
+<textarea data-template>
+# <i class="fab fa-wordpress" style="color:#1D91B3"></i> WP + MySQL
+
+Schritt 3: [ Den **Wordpress-Container** erstellen: ](./files/docker-run-wordpress.txt)
+
+* Portweiterleitung für Port 80
+* interne TCP-Verbindung zu MySQL
+* persistentes Daten-Volume
+
+```sh
+docker run -d \
+           --name wp-web \
+           --net wp-net \
+           -v wp-data:/var/www/html \
+           -e WORDPRESS_DB_HOST=wp-db \
+           -e WORDPRESS_DB_USER=root \
+           -e WORDPRESS_DB_PASSWORD=root \
+           -e WORDPRESS_DB_NAME=wordpress \
+           -p 80:80 \
+           wordpress
+```
+
+* **`-p 80:80`**: Port-Mapping gegen aussen: Der Host-Port 80 wird auf den Container-Port 80 gemappt
+* **`--net wp-net`**: Der Container wird mit dem internen Netz `wp-net` verbunden
+* **`-v wp-data:/var/www/html`**: Das Managed Volume `wp-data` wird ins Container-Verzeichnis gemountet
+</textarea>
+</section>
+
+<section data-markdown>
+<textarea data-template>
+# <i class="fab fa-wordpress" style="color:#1D91B3"></i> WP + MySQL
+
+Schritt 4: Es läuft!
+
+Nun sollte Wordpress bereits auf http://localhost/ erreichbar sein!
+
+<img src="img/wordpress-admin.png" width="70%" />
+</textarea>
+</section>
+
+<section data-markdown>
+<textarea data-template>
+# <i class="fab fa-wordpress" style="color:#1D91B3"></i> WP + MySQL
+
+<i class="fas fa-hdd"></i> Sicherung der Daten:
+
+* MySQL-DB:
+  * **Variante 1: Offline:** Wir sichern das Volume-Filesystem:<br />
+  Dazu mounten wir ein lokales Verzeichnis in den Container und kopieren die
+  gewünschten Dateien vom Container in dieses lokale Volume:
+```sh
+$ docker stop wp-db
+$ docker run --rm --volumes-from wp-db -v /local/backup:/backup \
+          ubuntu tar czvf /backup/db-data.tgz /var/lib/mysql
+```
+  * **Variante 2: Online:** Wir verwenden einen MySQL-Dump, in dem wir zum laufenden
+      Container via Netzwerk verbinden:
+```sh
+$ docker run --rm --net wp-net mysql:5 \
+          mysqldump -u root -proot -h wp-db wordpress > backup/wp-db.sql
+```
+* Und noch die Web-Files des Web-Containers (wie Variante 1 oben):
+```sh
+$ docker run --rm --volumes-from wp-web -v /local/backup:/backup \
+          ubuntu tar czvf /backup/web.tgz /var/www/html
+</textarea>
+</section>
+</section>
+
+
+
+
+
+
+
+
+
+
+<!-- ************************************** -->
+<section
+    data-background-image="img/docker-official.svg.png"
+    data-background-size="100px"
+    data-background-repeat="no-repeat"
+    data-background-position="top right"
+>
+<section data-markdown>
+<textarea data-template>
+# <i class="fab fa-docker" style="color:#1D91B3"></i> Container-Befehle
+
+**Container**:<br/>die wichtigsten Befehle und Parameter kurz zusammengefasst
+
+Management:
+```sh
+$ docker ps -a                 # Alle Container auflisten
+$ docker stop [container]      # laufenden Container stoppen
+$ docker start [container]     # bestehenden Container starten
+$ docker rm [container]        # Container löschen
+$ docker inspect [container]   # Container-Infos abrufen
+```
+
+Erstellen von Containern:
+```sh
+$ docker run ......
+    --name [name]      # Name und Hostname des Containers
+    --rm               # Container nach Beenden gleich entfernen
+    -d                 # als Hintergrund-Prozess (daemon)
+    -ti [oder -t -i]   # mit Terminal (tty) und interaktiv (stdin erhalten)
+    -e [env-var=wert]  # Umgebungsvariable setzen
+    -h [hostname]      # Hostname des Containers, wenn von Name unterschiedlich
+    -w [working-dir]   # Working-Dir für ausgeführten Prozess
+
+    ... Volume/Networking siehe nächste Folie
+```
+</textarea>
+</section>
+
+<section data-markdown>
+<textarea data-template>
+# <span style="color:#1D91B3"><i class="fas fa-hdd"></i> &amp; <i class="fas fa-network-wired"></i></span> Volumes, Networks
+
+**Volumes und Networking**:<br/>die wichtigsten Befehle und Parameter kurz zusammengefasst
+
+Management:
+```sh
+$ docker volume create [volume-name]         # Managed Volume erstellen
+$ docker network create [net-name]           # Bridge Network erstellen (meistgenutzte Variante)
+$ docker volume ls                           # Volumes auflisten
+$ docker network ls                          # Networks auflisten
+```
+
+Beim Erstellen eines Containers:
+```sh
+$ docker run ......
+    -v [volume-name]:[/pfad/im/container]    # Managed Volume in Container mounten
+    -v my-volume:/var/www/html               # Beispiel: Volume my-volume nach /var/www/html
+    -v [lokaler Pfad]:[/pfad/im/container]   # Lokales Host-Dir mit Container-Dir verbinden
+    -v /my/backup:/backup                    # Lokales dir /my/backup im Container nach /backup mounten
+
+    --net [network-name]                     # Container wird mit Docker-Network verbunden
+    -p [local port]:[container-port]         # Lokalen TCP-Port mit Container-Port verbinden
+    -p 3333:3306                             # Container-Port 3306 ist nun via Host-Port 3333 erreichbar
+```
+</textarea>
+</section>
+</section>
+
+
+
+<!-- ************************************** -->
+<section
+    data-background-image="img/docker-official.svg.png"
+    data-background-size="100px"
+    data-background-repeat="no-repeat"
+    data-background-position="top right"
+>
+<section data-markdown>
+<textarea data-template>
+# <i class="fas fa-tools" style="color:#1D91B3"></i> docker-compose
+
+Container-Management kann recht mühsam werden - vor allem bei mehreren Containern.
+
+**`docker-compose`** schafft hier Abhilfe: Es ist ein Tool, um Applikationen bestehend aus mehreren Containern zu definieren.
+
+<i class="far fa-hand-point-right"></i> Wir gehen folgendermassen vor:
+
+* wir definieren unsere Container, entweder als Images oder als `Dockerfile`
+* wir schreiben dazu ein `docker-compose.yml`-File <br />([ YAML ](https://en.wikipedia.org/wiki/YAML) - YAML Ain't Markup Language)
+* wir starten alles zusammen mit `docker-compose up`
+
+<i class="far fa-hand-point-right"></i> **So lassen sich ganz einfach ganze Multi-Container-Dienste verteilen** - z.B.
+für Schüler-Lern-Umgebungen!
+
+</textarea>
+</section>
+
+<section data-markdown>
+<textarea data-template>
+# <i class="fas fa-tools" style="color:#1D91B3"></i> &amp; <i class="fab fa-wordpress" style="color:#1D91B3"></i> |  WP nun einfach
+
+Das **Wordpress / MySQL**-Beispiel von vorher nun mit `docker-compose`.
+
+[ Das YAML-File ](files/wordpress.yaml):
+```yaml
+# wordpress.yaml:
+version: '3.3'
+
+services:
+   wp-db:
+     image: mysql:5
+     volumes:
+       - wp-db:/var/lib/mysql
+     restart: always
+     environment:
+       MYSQL_ROOT_PASSWORD: root
+       MYSQL_DATABASE: wordpress
+       MYSQL_USER: wordpress
+       MYSQL_PASSWORD: wordpress
+
+   wp-web:
+     depends_on:
+       - wp-db
+     image: wordpress:latest
+     volumes:
+        - wp-data:/var/www/html
+     ports:
+       - "80:80"
+     restart: always
+     environment:
+       WORDPRESS_DB_HOST: wp-db:3306
+       WORDPRESS_DB_USER: wordpress
+       WORDPRESS_DB_PASSWORD: wordpress
+       WORDPRESS_DB_NAME: wordpress
+volumes:
+    wp-db:
+    wp-data:
+```
+
+Starten des gesamten Paketes, im Hintergrund (-d, daemon):
+
+```sh
+$ docker-compose -f wordpress.yaml up -d
+```
+
+<i class="far fa-hand-point-right"></i> Das ist doch einiges einfacher, oder? ... und stop:
+
+```sh
+$ docker-compose -f wordpress.yaml down
+```
+</textarea>
+</section>
+
+<section data-markdown>
+<textarea data-template>
+# <i class="fas fa-tools" style="color:#1D91B3"></i> docker-compose
+
+Mehr Infos zu `docker-compose` und den YAML-Files:
+
+https://docs.docker.com/compose/
+
+</textarea>
+</section>
+</section>
+
+
+
+
+
+
+<!-- ************************************** -->
+<section
+    data-background-image="img/docker-official.svg.png"
+    data-background-size="100px"
+    data-background-repeat="no-repeat"
+    data-background-position="top right"
+>
+<section data-markdown>
+<textarea data-template>
+# <i class="fab fa-docker" style="color:#1D91B3"></i> Dockerfiles
+
+Mit vorgefertigen Images kommt man schon recht weit -- aber wir wollen auch eigene Images definieren können.
+
+`Dockerfiles` erlaubt genau dies - dies sind detaillierte Anweisungen, um ein Image zu bauen.
+
+Mit Dockerfiles:
+
+* führen wir Linux-Anweisungen in einem Intermediate-Image aus
+* kopieren wir Dateien in unser finales Image
+* definieren wir, welches Kommando unser Container startet
+
+Docker baut daraus dann ein fertiges Image, welches wir wiederum als Container starten können!
+</textarea>
+</section>
+
+<section data-markdown>
+<textarea data-template>
+# <i class="fab fa-docker" style="color:#1D91B3"></i> Dockerfiles <span style="font-size:0.3em">einfaches Beispiel</span>
+
+[ Ein erstes, einfaches Beispiel: Eine Linux-Umgebung für c++ - Programmierung ](./files/docker-cpp/Dockerfile)
+
+```Dockerfile
+# Wir "erben" vom Image:
+FROM ubuntu:18.04
+
+# Wir führen normale Linux-Kommandos aus:
+RUN apt-get update && apt-get dist-upgrade -y
+RUN apt-get install -y cmake make gcc g++
+
+# Wir kopieren Files vom lokalen Dir ins Image:
+COPY example.cpp /src/example.cpp
+
+# Wir setzen das Workdir für laufende Kommandos:
+WORKDIR /src
+
+# Dieser Prozess wird beim Start eines Containers gestartet:
+CMD g++ example.cpp -o example && ./example
+```
+
+Aus dem Dockerfile ein Image erstellen:
+```sh
+$ docker build -t [tagname] /pfad  # der Pfad zum Directory mit dem Dockerfile
+# Beispiel:
+$ docker build -t cpp-env /my/cpp/docker/
+```
+
+... und schlussendlich ein Container daraus erstellen:
+```sh
+$ docker run --name cpp -ti -v /meine/cpp/source:/src cpp-env
+```
+</textarea>
+</section>
+
+<section data-markdown>
+<textarea data-template>
+# <i class="fab fa-docker" style="color:#1D91B3"></i> Dockerfiles <span style="font-size:0.3em">Images anpassen</span>
+
+Meist möchte man bestehende Images leicht anpassen. Z.B. möchte man eine eigene Version
+eines Konfigurationsfiles für einen Dienst verwenden, und daraus dann wieder ein eigenes Image bauen.
+
+Dazu geht man folgendermassen vor <br/>[ (Beispiel an PHP/Apache-Image mit xdebug): ](./files/docker-php-apache/)
+
+1. Man extrahiert die gewünschten Config-Files aus dem Original-Image:
+```sh
+# Apache-Config extrahieren:
+$ docker run --rm php:7.4-apache cat /etc/apache2/sites-available/000-default.conf > apache.conf
+# PHP-Config extrahieren:
+docker run --rm php:7.4-apache cat /usr/local/etc/php/php.ini-development > php.ini
+```
+2. Man kopiert die (modifizierten) Files via eigenem Dockerfile wieder ins Image:
+```Dockerfile
+FROM php:7.4-apache
+RUN pecl install xdebug-2.9.2 && docker-php-ext-enable xdebug
+COPY php.ini /usr/local/etc/php/php.ini
+COPY apache.conf /etc/apache2/sites-available/000-default.conf
+```
+
+3. Man baut wieder ein eigenes Image:
+```sh
+$ docker build -t php:own-image ./apache-php/
+```
+
+</textarea>
+</section>
+
+<section data-markdown>
+<textarea data-template>
+# <i class="fab fa-docker" style="color:#1D91B3"></i> Dockerfiles <span style="font-size:0.3em">mit docker-compose</span>
+
+Images ab Dockerfiles können auch direkt mit docker-compose gebaut und verwendet werden.
+Dies ist ein sehr mächtiges Werkzeug, um komplette Umgebungen mit mehreren
+Services an andere zu verteilen:
+
+[ (Link zum yaml-File) ](./files/docker-php-apache/apache-php.yaml)
+```yaml
+# apache-php.yaml:
+version: '3'
+services:
+    webdev:
+        build: .
+        ports:
+            - "8080:80"
+        volumes:
+            - .:/var/www/html
+    db:
+        image: mysql:5
+        volumes:
+            - db:/var/lib/mysql
+        restart: always
+        environment:
+          MYSQL_ROOT_PASSWORD: root
+volumes:
+    db: {}
+```
+
+```sh
+$ docker-compose -f apache-php-yaml up
+```
+</textarea>
+</section>
+</section>
+
+
+
+
+
+
+
+
+<!-- ************************************** -->
+<section
+    data-background-image="img/docker-official.svg.png"
+    data-background-size="100px"
+    data-background-repeat="no-repeat"
+    data-background-position="top right"
+    data-markdown
+>
+<textarea data-template>
+# <i class="fas fa-link" style="color:#1D91B3"></i> Links
+
+* [Docker Overview](https://docs.docker.com/engine/docker-overview/)
+* [Docker Hub](https://hub.docker.com/)
+* [Docker Desktop for Windows](https://docs.docker.com/docker-for-windows/install/)
+* [Docker Desktop for Mac](https://docs.docker.com/docker-for-mac/)
+* [Docker Networking](https://docs.docker.com/network/)
+* [Docker Storage overview](https://docs.docker.com/storage/)
+* [Docker Compose](https://docs.docker.com/compose/)
+
+</textarea>
+</section>
+
+
+
+			</div>
+		</div>
+
+		<script src="js/reveal.js"></script>
+
+		<script>
+			// More info about config & dependencies:
+			// - https://github.com/hakimel/reveal.js#configuration
+			// - https://github.com/hakimel/reveal.js#dependencies
+			Reveal.initialize({
+                width: 1440,
+                height: 1080,
+                center: false,
+				hash: true,
+                transition: 'slide',
+                backgroundTransition: 'zoom',
+                markdown: {
+                    smartLists: true,
+                    smartypants: true
+                },
+				dependencies: [
+					{ src: 'plugin/markdown/marked.js' },
+					{ src: 'plugin/markdown/markdown.js' },
+                    { src: 'plugin/highlight/highlight.js', async: true },
+                    { src: 'plugin/zoom-js/zoom.js', async: true },
+					{ src: 'plugin/notes/notes.js', async: true }
+				]
+			});
+		</script>
+	</body>
+</html>
